@@ -1,4 +1,4 @@
-# FDA Food Safety Monitor
+# Autonomous Regulatory Change Find and Report AI System
 
 An automated system designed to monitor FDA press announcements and extract key food safety information using AI-powered analysis.
 
