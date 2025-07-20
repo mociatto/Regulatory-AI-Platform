@@ -1,5 +1,5 @@
 steps:
-  # 1. Build the container image using the Dockerfile
+  # 1. Build the container image
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
@@ -7,13 +7,13 @@ steps:
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
       - '.'
 
-  # 2. Push the container image to Artifact Registry
+  # 2. Push the container image
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
 
-  # 3. Deploy the container image to Cloud Run
+  # 3. Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
@@ -25,14 +25,12 @@ steps:
       - '--region'
       - 'us-central1'
       - '--no-allow-unauthenticated'
-      # Correctly substitute the variables from the trigger into environment variables for the application
       - '--set-env-vars=GCS_BUCKET_NAME=_GCS_BUCKET_NAME,GCP_PROJECT=$PROJECT_ID'
 
-# Tell Cloud Build which images to store
+# Specify the image to be built
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
 
-# Define logging behavior to resolve the build error
+# Define logging behavior to satisfy the trigger's requirement
 options:
-  logging: GCS_ONLY
-  logsBucket: 'gs://regulatory-ai-platform-466513-build-logs'
+  logs_bucket: 'gs://regulatory-ai-platform-466513-build-logs'
