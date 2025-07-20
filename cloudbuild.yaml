@@ -1,30 +1,14 @@
-# Cloud Build configuration file for automated container building and deployment
-# This file defines the steps to build, package, and deploy our application to Google Cloud
-
 steps:
-  # Step 1: Build the container image
-  # This step uses the Dockerfile to build our application into a container image.
-  # The image will be tagged with the latest version and stored in Artifact Registry.
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_REGION-docker.pkg.dev/$PROJECT_ID/$_SERVICE_NAME/$_SERVICE_NAME:latest', '.']
-    id: 'Build'
-
-  # Step 2: Push the container image to Artifact Registry
-  # This step uploads the built image to Google's secure container storage (Artifact Registry).
-  # The image becomes available for deployment to Cloud Run, GKE, or other Google Cloud services.
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', '$_REGION-docker.pkg.dev/$PROJECT_ID/$_SERVICE_NAME/$_SERVICE_NAME:latest']
-    id: 'Push'
-
-# Define the location of the final image
-# This section specifies where the built container image will be stored
-# The image path follows Google Cloud's Artifact Registry naming convention
-images:
-  - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_SERVICE_NAME/$_SERVICE_NAME:latest'
-
-# Define custom variables that we can set during the build process
-# These substitutions allow for flexible configuration and can be overridden
-# when triggering builds via command line or Cloud Build API
-substitutions:
-  _SERVICE_NAME: 'regulatory-ai-platform'  # Name of our application/service
-  _REGION: 'us-central1'                   # Google Cloud region for deployment 
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'gcloud'
+  args:
+    - 'run'
+    - 'deploy'
+    - 'regulatory-ai-platform'
+    - '--source'
+    - '.'
+    - '--region'
+    - 'us-central1'
+    - '--no-allow-unauthenticated'
+options:
+  logging: CLOUD_LOGGING_ONLY
