@@ -30,3 +30,7 @@ steps:
 # Specify the image to be built
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
+
+# Configure logging to satisfy service account requirements
+options:
+  logging: CLOUD_LOGGING_ONLY
