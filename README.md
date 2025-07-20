@@ -263,5 +263,3 @@ For issues or questions, please check the troubleshooting section or create an i
 ---
 
 **Note**: This system is designed to monitor publicly available FDA press announcements. Always verify critical information with official FDA sources. 
-
----
