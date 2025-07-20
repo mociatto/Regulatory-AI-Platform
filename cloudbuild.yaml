@@ -30,7 +30,3 @@ steps:
 # Specify the image to be built
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
-
-# Define logging behavior to satisfy the trigger's requirement
-options:
-  logs_bucket: 'gs://regulatory-ai-platform-466513-build-logs'
