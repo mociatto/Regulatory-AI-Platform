@@ -33,3 +33,7 @@ steps:
 # Define the location of the final image
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
+
+options:
+  logging: GCS_ONLY
+  logsBucket: 'gs://regulatory-ai-platform-466513-build-logs'
