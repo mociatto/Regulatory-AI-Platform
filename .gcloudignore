@@ -1,0 +1,14 @@
+# Ignore the local API key configuration
+api_config.json
+
+# Ignore the virtual environment
+.venv/
+pycache/
+*.pyc
+
+# Ignore generated reports
+report/
+
+# Ignore Git and gcloud configuration files
+.gcloudignore
+.gitignore 
