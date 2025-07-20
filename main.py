@@ -119,7 +119,7 @@ def run_analysis_pipeline():
         location = 'us-central1' # Or your preferred region
         vertexai.init(project=project_id, location=location)
         # Load the generative model
-        model = GenerativeModel("gemini-1.0-pro")
+        model = GenerativeModel("gemini-1.5-flash-001")
         print("Vertex AI model configured successfully.")
     except Exception as e:
         print(f"Error initializing Vertex AI: {e}")
