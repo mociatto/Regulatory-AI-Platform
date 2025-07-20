@@ -25,7 +25,7 @@ def analyze_article_with_ai(article_text, model):
     """
     
     try:
-        response = model.generate_content(prompt)
-        return response.text
+        response = model.generate_content(prompt).text
+        return response
     except Exception as e:
         return f"Error during AI analysis: {e}" 

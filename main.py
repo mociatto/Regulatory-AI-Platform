@@ -23,6 +23,7 @@ import google.generativeai as genai
 from config import TARGETS, PHARMA_KEYWORDS, SEARCH_START_DATE, SEARCH_END_DATE
 from ai_processor import analyze_article_with_ai
 from flask import Flask
+from google.cloud import storage
 
 app = Flask(__name__)
 
@@ -90,40 +91,17 @@ def is_article_relevant(text, keywords):
     else:
         return False, []
 
-def load_api_key():
-    """Load API key from environment variable first, then fall back to JSON file."""
-    # First try environment variable (for Cloud Run)
-    api_key = os.environ.get('GOOGLE_API_KEY')
-    if api_key:
-        return api_key
-    
-    # Fall back to JSON file (for local development)
+def save_report(report_data, bucket_name, filename):
+    """Save report data to a JSON file in a Google Cloud Storage bucket."""
     try:
-        with open('api_config.json', 'r') as f:
-            config = json.load(f)
-            api_key = config.get('GOOGLE_API_KEY')
-            if api_key and api_key != "your-api-key-here":
-                return api_key
-            else:
-                return None
-    except FileNotFoundError:
-        return None
-    except json.JSONDecodeError:
-        return None
-
-def save_report(report_data, filename):
-    """Save report data to a JSON file in the report directory."""
-    try:
-        # Ensure report directory exists
-        os.makedirs("report", exist_ok=True)
-        
-        # Save to report folder
-        filepath = os.path.join("report", filename)
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(report_data, f, indent=2, ensure_ascii=False)
-        print(f"Report saved to: {filepath}")
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(filename)
+        report_json_string = json.dumps(report_data, indent=2, ensure_ascii=False)
+        blob.upload_from_string(report_json_string, content_type='application/json')
+        print(f"Report saved to: gs://{bucket_name}/{filename}")
     except Exception as e:
-        print(f"Error saving report: {e}")
+        print(f"Error saving report to GCS: {e}")
 
 @app.route('/')
 def trigger_pipeline():
@@ -132,17 +110,20 @@ def trigger_pipeline():
 
 def run_analysis_pipeline():
     # All the logic that was previously in if __name__ == "__main__" goes here
-    # Load API key from environment variable or local JSON file
-    API_KEY = load_api_key()
-    if not API_KEY:
-        print("Error: API key not found or not configured.")
-        print("Please set GOOGLE_API_KEY environment variable or edit api_config.json")
-        return "Error: API key not configured"
-    
-    # Configure the Google AI model
-    genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash-latest')
-    print("AI model configured successfully.")
+    # Configure the Vertex AI model using Application Default Credentials
+    try:
+        import vertexai
+        from vertexai.generative_models import GenerativeModel
+        # Initialize Vertex AI. It will automatically use the service account's permissions.
+        project_id = os.environ.get('GCP_PROJECT')
+        location = 'us-central1' # Or your preferred region
+        vertexai.init(project=project_id, location=location)
+        # Load the generative model
+        model = GenerativeModel("gemini-1.5-flash-001")
+        print("Vertex AI model configured successfully.")
+    except Exception as e:
+        print(f"Error initializing Vertex AI: {e}")
+        return f"Error: Could not configure AI model. {e}"
     
     rss_url = TARGETS['UK']['rss_feed_url']
     print(f"Parsing BBC Health RSS feed: {rss_url}")
@@ -194,8 +175,15 @@ def run_analysis_pipeline():
         print("\n---")
         print(f"Processing Complete. Found {len(relevant_articles)} relevant articles out of {len(articles)} total.")
         
-        # Save AI findings to JSON file
-        save_report(ai_findings, "ai_findings_for_review.json")
+        # Save AI findings to Google Cloud Storage
+        bucket_name = os.environ.get('GCS_BUCKET_NAME')
+        if bucket_name:
+            # Create a timestamp for a unique filename
+            timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+            filename = f"report_{timestamp}.json"
+            save_report(ai_findings, bucket_name, filename)
+        else:
+            print("GCS_BUCKET_NAME environment variable not set. Skipping report save.")
         
         if relevant_articles:
             print("\nCollected Relevant Articles:")
@@ -206,7 +194,6 @@ def run_analysis_pipeline():
                 print(f"   Matched Keywords: {article['matched_keywords']}")
                 print()
         
-        print(f"\nAI findings have been saved to 'report/ai_findings_for_review.json' for human review.")
         # At the end, instead of printing, return a success message
         return "Regulatory AI Pipeline finished successfully."
     else:
@@ -218,5 +205,3 @@ if __name__ == "__main__":
     # Cloud Run will use a production WSGI server instead
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port) 
-
-    # Final test of the automated CI/CD pipeline
