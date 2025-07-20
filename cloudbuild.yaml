@@ -1,14 +1,35 @@
 steps:
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  entrypoint: 'gcloud'
-  args:
-    - 'run'
-    - 'deploy'
-    - 'regulatory-ai-platform'
-    - '--source'
-    - '.'
-    - '--region'
-    - 'us-central1'
-    - '--no-allow-unauthenticated'
-options:
-  logging: CLOUD_LOGGING_ONLY
+  # 1. Build the container image using the Dockerfile in the repository
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
+      - '.'
+
+  # 2. Push the container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
+
+  # 3. Deploy the container to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'regulatory-ai-platform'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'GCS_BUCKET_NAME=regulatory-ai-reports'
+
+# Define the location of the final image
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
