@@ -110,20 +110,14 @@ def trigger_pipeline():
 
 def run_analysis_pipeline():
     # All the logic that was previously in if __name__ == "__main__" goes here
-    # Configure the Vertex AI model using Application Default Credentials
-    try:
-        import vertexai
-        from vertexai.generative_models import GenerativeModel
-        # Initialize Vertex AI. It will automatically use the service account's permissions.
-        project_id = os.environ.get('GCP_PROJECT')
-        location = 'us-central1'
-        vertexai.init(project=project_id, location=location)
-        # Initialize Vertex AI model
-        model = GenerativeModel("gemini-1.0-pro-001")
-        print("Vertex AI model configured successfully.")
-    except Exception as e:
-        print(f"Error initializing Vertex AI: {e}")
-        return f"Error: Could not configure AI model. {e}"
+    # Configure google-generativeai with API key
+    api_key = os.environ.get('GOOGLE_API_KEY')
+    if not api_key:
+        raise RuntimeError('GOOGLE_API_KEY environment variable not set')
+    genai.configure(api_key=api_key)
+    # Initialize the generative model
+    model = genai.GenerativeModel('gemini-1.0-pro')
+    print("google-generativeai model configured successfully.")
     
     rss_url = TARGETS['UK']['rss_feed_url']
     print(f"Parsing BBC Health RSS feed: {rss_url}")
