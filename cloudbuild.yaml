@@ -6,14 +6,12 @@ steps:
       - '-t'
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
       - '.'
-
   # 2. Push the container image
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
-
-  # 3. Deploy to Cloud Run
+  # 3. Deploy to Cloud Run, explicitly setting the service account
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
@@ -25,12 +23,9 @@ steps:
       - '--region'
       - 'us-central1'
       - '--no-allow-unauthenticated'
+      - '--service-account=418676774898-compute@developer.gserviceaccount.com'
       - '--set-env-vars=GCS_BUCKET_NAME=_GCS_BUCKET_NAME,GCP_PROJECT=$PROJECT_ID'
-
-# Specify the image to be built
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
-
-# Configure logging to satisfy service account requirements
 options:
   logging: CLOUD_LOGGING_ONLY
