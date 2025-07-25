@@ -21,7 +21,7 @@ steps:
       - '--image'
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
       - '--region'
-      - 'us-east4' 
+      - 'us-central1'
       - '--no-allow-unauthenticated'
       - '--service-account=418676774898-compute@developer.gserviceaccount.com'
       - '--set-env-vars=GCS_BUCKET_NAME=_GCS_BUCKET_NAME,GCP_PROJECT=$PROJECT_ID'
