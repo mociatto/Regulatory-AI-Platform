@@ -116,7 +116,7 @@ def run_analysis_pipeline():
         raise RuntimeError('GOOGLE_API_KEY environment variable not set')
     genai.configure(api_key=api_key)
     # Initialize the generative model
-    model = genai.GenerativeModel('gemini-1.0-pro')
+    model = genai.GenerativeModel('gemini-1.5-flash-001')
     print("google-generativeai model configured successfully.")
     
     rss_url = TARGETS['UK']['rss_feed_url']
