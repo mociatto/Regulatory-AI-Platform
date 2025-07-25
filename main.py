@@ -116,7 +116,7 @@ def run_analysis_pipeline():
         from vertexai.generative_models import GenerativeModel
         # Initialize Vertex AI. It will automatically use the service account's permissions.
         project_id = os.environ.get('GCP_PROJECT')
-        location = 'us-central1' # Or your preferred region
+        location = 'us-east4'
         vertexai.init(project=project_id, location=location)
         # Initialize Vertex AI model
         model = GenerativeModel("gemini-1.5-flash-001")
