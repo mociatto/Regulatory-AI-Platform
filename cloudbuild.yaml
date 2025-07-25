@@ -24,7 +24,7 @@ steps:
       - 'us-central1'
       - '--no-allow-unauthenticated'
       - '--service-account=regulatory-ai-runner@regulatory-ai-platform-466513.iam.gserviceaccount.com'
-      - '--set-env-vars=GCS_BUCKET_NAME=_GCS_BUCKET_NAME,GCP_PROJECT=$PROJECT_ID,GOOGLE_API_KEY=AIzaSyBh6S4wBprDsZahuC-G1gvp89drDEIzm0c'
+      - '--set-env-vars=GCS_BUCKET_NAME=regulatory-ai-platform-466513-reports,GCP_PROJECT=$PROJECT_ID,GOOGLE_API_KEY=AIzaSyBh6S4wBprDsZahuC-G1gvp89drDEIzm0c'
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
 options:
