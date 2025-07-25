@@ -23,7 +23,7 @@ steps:
       - '--region'
       - 'us-central1'
       - '--no-allow-unauthenticated'
-      - '--service-account=418676774898-compute@developer.gserviceaccount.com'
+      - '--service-account=regulatory-ai-runner@regulatory-ai-platform-466513.iam.gserviceaccount.com'
       - '--set-env-vars=GCS_BUCKET_NAME=_GCS_BUCKET_NAME,GCP_PROJECT=$PROJECT_ID'
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/regulatory-ai-repo/regulatory-ai-platform:$COMMIT_SHA'
