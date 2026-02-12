@@ -24,6 +24,6 @@ PHARMA_KEYWORDS = [
     'subutex',
     'perseris',
     'opvee',
-    'mhra', # UK Regulatory Agency
-    'fda'   # US Regulatory Agency
+    'mhra',
+    'fda'
 ] 
